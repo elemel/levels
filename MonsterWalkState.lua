@@ -15,6 +15,12 @@ function MonsterWalkState:init(monster)
 end
 
 function MonsterWalkState:updateTransition(dt)
+  if self.monster.stats.health <= 0 then
+    local MonsterDeadState = require("MonsterDeadState")
+    self.monster.state = MonsterDeadState.new(self.monster)
+    return
+  end
+
   self.monster:updateWalls()
 
   if not self.monster.walls.down then
@@ -24,7 +30,7 @@ function MonsterWalkState:updateTransition(dt)
   end
 
   if self.monster.inputs.y > 0.5 then
-    local MonsterFallState = require("MonsterFallState")
+    local MonsterFallState = require("MonsterCrouchFallState")
     self.monster.state = MonsterFallState.new(self.monster)
     return
   end
@@ -35,7 +41,8 @@ function MonsterWalkState:updateTransition(dt)
     return
   end
 
-  if self.monster.inputs.jump and not self.monster.inputs.oldJump then
+  if self.monster.inputs.y < -0.5 and self.monster.oldInputs.y > -0.5 then
+    self.monster.game:playSound("resources/sounds/jump.ogg")
     local boxSystem = assert(self.monster.game.systems.box)
     local velocityX, velocityY = boxSystem:getVelocity(self.monster.id)
 

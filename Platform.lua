@@ -6,6 +6,7 @@ function Platform:init(game, config)
   self.game = assert(game)
   self.id = self.game:generateId()
   self.game.platforms[self.id] = self
+  self.boxSystem = assert(self.game.systems.box)
   self.x1 = assert(config.x1)
   self.y1 = assert(config.y1)
   self.x2 = assert(config.x2)
@@ -17,23 +18,20 @@ function Platform:init(game, config)
   local height = config.height or 1
   local velocityX = config.velocityX or 0
   local velocityY = config.velocityY or 0
-
-  self.game.systems.box:createBox(
-    self.id, x, y, width, height, velocityX, velocityY)
+  self.boxSystem:createBox(self.id, x, y, width, height, velocityX, velocityY)
 end
 
 function Platform:destroy()
-  self.game.systems.box:destroyBox(self.id)
+  self.boxSystem:destroyBox(self.id)
   self.game.platforms[self.id] = nil
 end
 
 function Platform:updateVelocity(dt)
-  local boxSystem = self.game.systems.box
-  local x, y = boxSystem:getPosition(self.id)
+  local x, y = self.boxSystem:getPosition(self.id)
   local targetX, targetY = self:getTargetPosition(self.game.fixedTime, x, y)
   local velocityX = (targetX - x) / dt
   local velocityY = (targetY - y) / dt
-  boxSystem:setVelocity(self.id, velocityX, velocityY)
+  self.boxSystem:setVelocity(self.id, velocityX, velocityY)
 end
 
 function Platform:getTargetPosition(time, originX, originY)
@@ -44,10 +42,17 @@ function Platform:getTargetPosition(time, originX, originY)
 end
 
 function Platform:normalizePosition(x, y, originX, originY)
-  local boxSystem = self.game.systems.box
-  local worldWidth = boxSystem.worldWidth
+  local worldWidth = self.boxSystem.worldWidth
   x = originX + (x - originX + 0.5 * worldWidth) % worldWidth - 0.5 * worldWidth
   return x, y
+end
+
+function Platform:getPosition()
+  return self.boxSystem:getPosition(self.id)
+end
+
+function Platform:draw()
+  self.game:drawImage("resources/images/platform.png", self:getPosition())
 end
 
 return Platform

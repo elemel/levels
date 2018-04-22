@@ -13,6 +13,12 @@ function MonsterCrouchState:init(monster)
 end
 
 function MonsterCrouchState:updateTransition(dt)
+  if self.monster.stats.health <= 0 then
+    local MonsterDeadState = require("MonsterDeadState")
+    self.monster.state = MonsterDeadState.new(self.monster)
+    return
+  end
+
   self.monster:updateWalls()
 
   if not self.monster.walls.down then

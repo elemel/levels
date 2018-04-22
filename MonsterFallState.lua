@@ -13,9 +13,16 @@ function MonsterFallState:init(monster)
 end
 
 function MonsterFallState:updateTransition(dt)
+  if self.monster.stats.health <= 0 then
+    local MonsterDeadState = require("MonsterDeadState")
+    self.monster.state = MonsterDeadState.new(self.monster)
+    return
+  end
+
   self.monster:updateWalls()
 
   if self.monster.walls.down then
+    self.monster.game:playSound("resources/sounds/crouch.ogg")
     local MonsterStandState = require("MonsterStandState")
     self.monster.state = MonsterStandState.new(self.monster)
     return

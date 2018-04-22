@@ -20,8 +20,9 @@ function Monster:init(game, config)
   self.inputs = {}
   self.inputs.x = 0
   self.inputs.y = 0
-  self.inputs.oldJump = false
-  self.inputs.jump = false
+  self.oldInputs = {}
+  self.oldInputs.x = 0
+  self.oldInputs.y = 0
   self.stats = {}
   self.stats.walkAcceleration = 20
   self.stats.walkSpeed = 5
@@ -34,6 +35,8 @@ function Monster:init(game, config)
   self.stats.crouchHeight = config.crouchHeight or 1.25
   self.stats.standWidth = config.standWidth or 0.75
   self.stats.standHeight = config.standHeight or 1.75
+  self.stats.maxHealth = config.maxHealth or 3
+  self.stats.health = config.health or self.stats.maxHealth
   self.state = MonsterWalkState.new(self)
   self.wallCollisions = {}
   self.walls = {}
@@ -173,17 +176,17 @@ function Monster:draw()
   self.state:draw()
 end
 
+function Monster:getPosition()
+  local boxSystem = self.game.systems.box
+  return boxSystem:getPosition(self.id)
+end
+
 function Monster:drawSkin(frame)
   local filename =
     "resources/images/skins/" .. self.skin .. "/" .. frame .. ".png"
 
-  local image = self.game:loadImage(filename)
-  local boxSystem = self.game.systems.box
-  local width, height = image:getDimensions()
-  local scaleX = self.direction * 1 / 16
-  local scaleY = 1 / 16
-  local x, y = boxSystem:getPosition(self.id)
-  love.graphics.draw(image, x, y, 0, scaleX, scaleY, 0.5 * width, 0.5 * height)
+  local x, y = self:getPosition()
+  self.game:drawImage(filename, x, y, 0, self.direction)
 end
 
 return Monster

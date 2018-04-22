@@ -42,7 +42,7 @@ function MonsterDeadState:updateCollision(dt)
 end
 
 function MonsterDeadState:draw()
-  self.monster:drawSkin("crouch")
+  self.monster:drawSkin("dead")
 end
 
 return MonsterDeadState
