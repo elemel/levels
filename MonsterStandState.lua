@@ -24,8 +24,8 @@ function MonsterStandState:updateTransition(dt)
   end
 
   if self.monster.inputs.y > 0.5 then
-    local MonsterFallState = require("MonsterFallState")
-    self.monster.state = MonsterFallState.new(self.monster)
+    local MonsterCrouchFallState = require("MonsterCrouchFallState")
+    self.monster.state = MonsterCrouchFallState.new(self.monster)
     return
   end
 
@@ -76,6 +76,11 @@ end
 
 function MonsterStandState:updateCollision(dt)
   self.monster:resolveWallCollisions()
+  self.monster:updateDirection()
+end
+
+function MonsterStandState:draw()
+  self.monster:drawSkin("stand")
 end
 
 return MonsterStandState

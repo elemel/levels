@@ -8,6 +8,9 @@ local MonsterDeadState = utils.newClass()
 function MonsterDeadState:init(monster)
   self.monster = assert(monster)
   self.monster.dead = true
+
+  self.monster.game.systems.box:setDimensions(
+    monster.id, monster.stats.crouchWidth, monster.stats.crouchHeight)
 end
 
 function MonsterDeadState:updateTransition(dt)
@@ -36,6 +39,10 @@ function MonsterDeadState:updateVelocity(dt)
 end
 
 function MonsterDeadState:updateCollision(dt)
+end
+
+function MonsterDeadState:draw()
+  self.monster:drawSkin("crouch")
 end
 
 return MonsterDeadState

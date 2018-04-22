@@ -24,24 +24,26 @@ function Game:init(config)
   self.altars = {}
   self.players = {}
   self.monsters = {}
+  self.images = {}
   local wall = Wall.new(self, {width = 16, height = 0.5, y = 0.75})
+  local wall = Wall.new(self, {width = 0.5, height = 6, y = -2.5})
+  local wall = Wall.new(self, {width = 8, height = 0.5, y = -5.75})
   local altar = Altar.new(self, {x = -4})
-  local wall = Wall.new(self, {x = 7.75})
+  local wall = Wall.new(self, {x = 4, y = -0.5, width = 2, height = 2})
+  local wall = Wall.new(self, {x = 3, y = -7, width = 2, height = 2})
   local player = Player.new(self, {})
 
   Platform.new(self, {
-    y = -1.75,
+    x1 = -6,
+    y1 = -3.5,
+    x2 = 6,
+    y2 = -3.5,
+    period = 5,
     width = 2,
     height = 0.5,
     velocityX = 2,
   })
 
-  Platform.new(self, {
-    y = -3,
-    width = 2,
-    height = 0.5,
-    velocityX = -1,
-  })
 end
 
 function Game:update(dt)
@@ -71,6 +73,10 @@ function Game:fixedUpdate(dt)
     monster:updateTransition(dt)
   end
 
+  for id, platform in pairs(self.platforms) do
+    platform:updateVelocity(dt)
+  end
+
   for id, monster in pairs(self.monsters) do
     monster:updateVelocity(dt)
   end
@@ -90,6 +96,10 @@ function Game:draw()
   love.graphics.applyTransform(self.camera:getTransform())
   love.graphics.setLineWidth(self.camera:getLineWidth())
   self:drawDebug()
+
+  for id, monster in pairs(self.monsters) do
+    monster:draw()
+  end
 end
 
 function Game:drawDebug()
@@ -103,6 +113,15 @@ end
 function Game:generateId()
   self.maxId = self.maxId + 1
   return self.maxId
+end
+
+function Game:loadImage(filename)
+  print(filename)
+  if not self.images[filename] then
+    self.images[filename] = love.graphics.newImage(filename)
+  end
+
+  return self.images[filename]
 end
 
 return Game

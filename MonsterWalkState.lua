@@ -78,6 +78,11 @@ end
 
 function MonsterWalkState:updateCollision(dt)
   self.monster:resolveWallCollisions()
+  self.monster:updateDirection()
+end
+
+function MonsterWalkState:draw()
+  self.monster:drawSkin("stand")
 end
 
 return MonsterWalkState

@@ -39,6 +39,8 @@ function Monster:init(game, config)
   self.walls = {}
   self.alignment = config.alignment or "evil"
   self.dead = false
+  self.skin = config.skin or "hero"
+  self.direction = config.direction or 1
 end
 
 function Monster:destroy()
@@ -67,27 +69,29 @@ function Monster:updateWalls()
   self.walls.right = nil
 
   local boxSystem = self.game.systems.box
+  local walls = game.walls
+  local platforms = game.platforms
   local x, y = boxSystem:getPosition(self.id)
   local x1, y1, x2, y2 = boxSystem:getBounds(self.id)
 
-  local function callback(id)
-    if id ~= self.id then
-      local x3, y3, x4, y4 = boxSystem:getNearestBounds(id, x, y)
+  local function callback(otherId)
+    if walls[otherId] or platforms[otherId] then
+      local x3, y3, x4, y4 = boxSystem:getNearestBounds(otherId, x, y)
 
       local distance, normalX, normalY =
         utils.maxDistanceBox(x1, y1, x2, y2, x3, y3, x4, y4)
 
       if abs(normalX) > abs(normalY) then
         if normalX < 0 then
-          self.walls.left = id
+          self.walls.left = otherId
         else
-          self.walls.right = id
+          self.walls.right = otherId
         end
       else
         if normalY < 0 then
-          self.walls.up = id
+          self.walls.up = otherId
         else
-          self.walls.down = id
+          self.walls.down = otherId
         end
       end
     end
@@ -97,7 +101,9 @@ function Monster:updateWalls()
 end
 
 function Monster:resolveWallCollisions()
-  self:resolveWallCollision()
+  for i = 1, 4 do
+    self:resolveWallCollision()
+  end
 end
 
 function Monster:resolveWallCollision()
@@ -155,6 +161,29 @@ function Monster:resolveWallCollision()
     boxSystem:setPosition(id, x, y)
     boxSystem:setVelocity(id, velocityX, velocityY)    
   end
+end
+
+function Monster:updateDirection()
+  if math.abs(self.inputs.x) > 0.5 then
+    self.direction = (self.inputs.x) < 0 and -1 or 1
+  end
+end
+
+function Monster:draw()
+  self.state:draw()
+end
+
+function Monster:drawSkin(frame)
+  local filename =
+    "resources/images/skins/" .. self.skin .. "/" .. frame .. ".png"
+
+  local image = self.game:loadImage(filename)
+  local boxSystem = self.game.systems.box
+  local width, height = image:getDimensions()
+  local scaleX = self.direction * 1 / 16
+  local scaleY = 1 / 16
+  local x, y = boxSystem:getPosition(self.id)
+  love.graphics.draw(image, x, y, 0, scaleX, scaleY, 0.5 * width, 0.5 * height)
 end
 
 return Monster

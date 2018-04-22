@@ -7,7 +7,7 @@ function Player:init(game, config)
   self.game = assert(game)
   self.id = self.game:generateId()
   self.game.players[self.id] = self
-  self.maxCameraDistance = config.maxCameraDistance or 2
+  self.maxCameraDistance = config.maxCameraDistance or 1
 end
 
 function Player:updateInput(dt)

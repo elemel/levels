@@ -3,39 +3,39 @@ local utils = require("utils")
 local assert = assert
 local clamp = utils.clamp
 
-local MonsterFallState = utils.newClass()
+local MonsterCrouchFallState = utils.newClass()
 
-function MonsterFallState:init(monster)
+function MonsterCrouchFallState:init(monster)
   self.monster = assert(monster)
 
   self.monster.game.systems.box:setDimensions(
-    monster.id, monster.stats.standWidth, monster.stats.standHeight)
+    monster.id, monster.stats.crouchWidth, monster.stats.crouchHeight)
 end
 
-function MonsterFallState:updateTransition(dt)
+function MonsterCrouchFallState:updateTransition(dt)
   self.monster:updateWalls()
 
   if self.monster.walls.down then
-    local MonsterStandState = require("MonsterStandState")
-    self.monster.state = MonsterStandState.new(self.monster)
+    local MonsterCrouchState = require("MonsterCrouchState")
+    self.monster.state = MonsterCrouchState.new(self.monster)
     return
   end
 
-  if self.monster.inputs.y > 0.5 then
-    local MonsterCrouchFallState = require("MonsterCrouchFallState")
+  if self.monster.inputs.y < 0.5 then
+    local MonsterCrouchFallState = require("MonsterFallState")
     self.monster.state = MonsterCrouchFallState.new(self.monster)
     return
   end
 end
 
-function MonsterFallState:updateVelocity(dt)
+function MonsterCrouchFallState:updateVelocity(dt)
   local monster = self.monster
   local stats = monster.stats
   local boxSystem = assert(monster.game.systems.box)
   local velocityX, velocityY = boxSystem:getVelocity(monster.id)
 
   local targetVelocityX =
-  velocityX + monster.inputs.x * monster.stats.airControlSpeed
+    velocityX + monster.inputs.x * monster.stats.airControlSpeed
 
   targetVelocityX =
     clamp(
@@ -57,13 +57,13 @@ function MonsterFallState:updateVelocity(dt)
   boxSystem:setVelocity(monster.id, velocityX, velocityY)
 end
 
-function MonsterFallState:updateCollision(dt)
+function MonsterCrouchFallState:updateCollision(dt)
   self.monster:resolveWallCollisions()
   self.monster:updateDirection()
 end
 
-function MonsterFallState:draw()
-  self.monster:drawSkin("stand")
+function MonsterCrouchFallState:draw()
+  self.monster:drawSkin("crouch")
 end
 
-return MonsterFallState
+return MonsterCrouchFallState

@@ -2,6 +2,14 @@ local max = math.max
 local min = math.min
 local setmetatable = setmetatable
 
+local function mix(x1, x2, t)
+  return (1 - t) * x1 + t * x2
+end
+
+local function mix2(x1, y1, x2, y2, t)
+  return (1 - t) * x1 + t * x2, (1 - t) * y1 + t * y2
+end
+
 local function clamp(x, x1, x2)
   return min(max(x, x1), x2)
 end
@@ -50,6 +58,8 @@ end
 
 return {
   clamp = clamp,
+  mix = mix,
+  mix2 = mix2,
   newClass = newClass,
   boxesIntersect = boxesIntersect,
   boxesIntersection = boxesIntersection,

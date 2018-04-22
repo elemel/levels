@@ -26,20 +26,6 @@ function MonsterCrouchState:updateTransition(dt)
     self.monster.state = MonsterStandState.new(self.monster)
     return
   end
-
-  if self.monster.inputs.jump and not self.monster.inputs.oldJump then
-    local boxSystem = assert(self.monster.game.systems.box)
-    local velocityX, velocityY = boxSystem:getVelocity(self.monster.id)
-
-    local wallVelocityX, wallVelocityY =
-      boxSystem:getVelocity(self.monster.walls.down)
-
-    boxSystem:setVelocity(
-      self.monster.id, velocityX, wallVelocityY - self.monster.stats.jumpSpeed)
-
-    local MonsterFallState = require("MonsterFallState")
-    self.monster.state = MonsterFallState.new(self.monster)
-  end
 end
 
 function MonsterCrouchState:updateVelocity(dt)
@@ -68,6 +54,11 @@ end
 
 function MonsterCrouchState:updateCollision(dt)
   self.monster:resolveWallCollisions()
+  self.monster:updateDirection()
+end
+
+function MonsterCrouchState:draw()
+  self.monster:drawSkin("crouch")
 end
 
 return MonsterCrouchState
