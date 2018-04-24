@@ -16,7 +16,14 @@ function Game:init(config)
   self.fixedTime = 0
   self.fixedDt = config.fixedDt or 1 / 60
   self.maxId = 0
-  self.camera = Camera.new({scale = 1 / 16})
+  local width, height = love.graphics.getDimensions()
+
+  self.camera = Camera.new({
+    scale = 1 / 16,
+    viewportWidth = width,
+    viewportHeight = height,
+  })
+
   self.systems = {}
   self.systems.box = BoxSystem.new(self, {})
   self.walls = {}
